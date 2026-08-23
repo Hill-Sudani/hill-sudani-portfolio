@@ -52,3 +52,6 @@ __pycache__/
 #                                        an Artifact rather than shipped here)
 design-system/canvas/loading-lab.html
 design-system/canvas/portfolio-palette-directions.html
+
+# dev-server logs written by the local preview tooling
+/build/
