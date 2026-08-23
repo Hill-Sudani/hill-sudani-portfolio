@@ -1,0 +1,173 @@
+/* ============================================================================
+   DESIGN TOKENS — the single source of truth.
+   Mirrored in app/motion.ts for JS consumers (Framer Motion, GSAP).
+   Spec: DESIGN_SYSTEM.md. Do not add a value here without adding it there.
+   ========================================================================= */
+
+:root {
+  color-scheme: dark;
+
+  /* --- 1.1 Surfaces ------------------------------------------------------
+     Palette "Archive". Built in oklch, not picked by eye: the base carries a
+     deliberate warm tint (chroma ~0.008 at hue 75) rather than sitting on a
+     neutral grey, which is most of what separates this from default dark mode. */
+  --surface-void: #0e0c09;
+  --surface-raised: #1a1713;
+  --surface-overlay: #23201a;
+  --surface-inset: #080604;
+
+  /* --- 1.2 Text (ratios vs void / raised in DESIGN_SYSTEM.md) ------------ */
+  --text-primary: #eae5dd;    /* 15.58 : 1  bone */
+  --text-secondary: #aea8a0;  /*  8.29 : 1 */
+  --text-muted: #8c877f;      /*  5.48 : 1  (5.01 : 1 on raised) */
+  --text-faint: #67635c;      /*  3.27 : 1 — NON-TEXT ONLY */
+
+  /* --- 1.3 Semantic accents ----------------------------------------------
+     All three sit at ONE lightness (oklch L 0.760) and ONE chroma (0.085) and
+     differ only in hue. That is what stops them competing: they read as one
+     family, so the page keeps a hierarchy instead of three colours shouting. */
+  --signal: #c8ae71;          /* brass  — confirmed / mechanism found  9.07 : 1 */
+  --signal-dim: #9c8347;      /* signal at rest — borders, gridlines   5.35 : 1 */
+  --null: #e19f8a;            /* clay   — refuted / did not hold       8.86 : 1 */
+  --trace: #9bb4ce;           /* slate  — structural, carries no verdict 9.13 : 1 */
+
+  --signal-wash: rgba(200, 174, 113, 0.12);
+  --null-wash: rgba(225, 159, 138, 0.12);
+  --trace-wash: rgba(155, 180, 206, 0.12);
+
+  /* --- 1.4 Lines --------------------------------------------------------- */
+  --line-hairline: rgba(234, 229, 221, 0.09);
+  --line-standard: rgba(234, 229, 221, 0.16);
+  --line-strong: rgba(234, 229, 221, 0.28);
+  --line-signal: rgba(200, 174, 113, 0.38);
+
+  /* --- 1.5 Focus --------------------------------------------------------- */
+  --focus-offset: 3px;
+
+  /* --- 2.1 Type scale ---------------------------------------------------- */
+  --fs-mega: clamp(4.5rem, 15vw, 15rem);
+  --fs-display: clamp(3rem, 8vw, 7rem);
+  --fs-h1: clamp(2.5rem, 5.5vw, 4.5rem);
+  --fs-h2: clamp(1.875rem, 3.5vw, 2.75rem);
+  --fs-h3: clamp(1.375rem, 2vw, 1.75rem);
+  --fs-lead: clamp(1.125rem, 1.5vw, 1.375rem);
+  --fs-body: 1.0625rem;
+  --fs-body-sm: 0.9375rem;
+  --fs-caption: 0.8125rem;
+  --fs-label: 0.6875rem;
+
+  --lh-mega: 0.82;
+  --lh-display: 0.9;
+  --lh-h1: 0.98;
+  --lh-h2: 1.08;
+  --lh-h3: 1.2;
+  --lh-lead: 1.5;
+  --lh-body: 1.6;
+  --lh-body-sm: 1.55;
+  --lh-caption: 1.45;
+  --lh-label: 1.3;
+
+  --ls-mega: -0.045em;
+  --ls-display: -0.035em;
+  --ls-h1: -0.03em;
+  --ls-h2: -0.022em;
+  --ls-h3: -0.015em;
+  --ls-lead: -0.005em;
+  --ls-body: 0;
+  --ls-caption: 0.005em;
+  --ls-label: 0.14em;
+
+  /* --- 2.2 Weights ------------------------------------------------------- */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* --- 3 Spacing --------------------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+  --space-11: 12rem;
+
+  --section-pad-y: clamp(var(--space-9), 12vh, var(--space-11));
+  --shell-width: min(100% - var(--space-6), 1440px);
+  --shell-narrow: min(100% - var(--space-6), 1040px);
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+
+  --header-height: 68px;
+
+  /* --- 4.1 Easing family — one family, four members ---------------------- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-micro: cubic-bezier(0.34, 0.8, 0.36, 1);
+
+  /* --- 4.3 Duration tiers ------------------------------------------------ */
+  --dur-1: 120ms;   /* micro    */
+  --dur-2: 220ms;   /* control  */
+  --dur-3: 640ms;   /* reveal   */
+  --dur-4: 900ms;   /* composition */
+  --dur-5: 1400ms;  /* scene    */
+
+  /* --- 4.4 Travel distance ----------------------------------------------- */
+  --travel-xs: 8px;
+  --travel-sm: 16px;
+  --travel-md: 32px;
+  --travel-lg: 64px;
+  --travel-xl: 120px;
+
+  /* --- 4.5 Stagger ------------------------------------------------------- */
+  --stagger-tight: 40ms;
+  --stagger-base: 80ms;
+  --stagger-loose: 140ms;
+
+  /* --- 4.6 Parallax depth ratios ----------------------------------------- */
+  --parallax-back: 0.85;
+  --parallax-mid: 0.94;
+  --parallax-base: 1;
+  --parallax-fore: 1.08;
+}
+
+/* --- 4.9 Mobile motion design — a different design, not a smaller one ---- */
+@media (max-width: 767px) {
+  :root {
+    --travel-md: 16px;
+    --travel-lg: 32px;
+    --travel-xl: 56px;
+
+    --parallax-back: 0.93;
+    --parallax-mid: 0.97;
+    --parallax-fore: 1.04;
+  }
+}
+
+/* --- 4.8 Reduced motion — a genuine variant, not a kill switch -----------
+   Displacement goes to zero and durations compress. Stagger is deliberately
+   UNCHANGED: sequence and hierarchy survive, movement does not.            */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --travel-xs: 0px;
+    --travel-sm: 0px;
+    --travel-md: 0px;
+    --travel-lg: 0px;
+    --travel-xl: 0px;
+
+    --dur-3: 320ms;
+    --dur-4: 380ms;
+    --dur-5: 420ms;
+
+    --parallax-back: 1;
+    --parallax-mid: 1;
+    --parallax-fore: 1;
+  }
+}

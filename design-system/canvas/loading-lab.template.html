@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loading Lab — Hill Sudani</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;700&display=swap">
+<style>
+  /* Archive palette + motion tokens, copied from app/tokens.css. */
+  :root {
+    --surface-void: #0e0c09;
+    --surface-raised: #1a1713;
+    --surface-inset: #080604;
+    --text-primary: #eae5dd;
+    --text-secondary: #aea8a0;
+    --text-muted: #8c877f;
+    --text-faint: #67635c;
+    --signal: #c8ae71;
+    --signal-dim: #9c8347;
+    --null: #e19f8a;
+    --trace: #9bb4ce;
+    --line-hairline: rgba(234, 229, 221, 0.09);
+    --line-standard: rgba(234, 229, 221, 0.16);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-micro: cubic-bezier(0.34, 0.8, 0.36, 1);
+    --dur-1: 120ms;
+    --dur-2: 220ms;
+    --dur-3: 640ms;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--surface-void);
+    color: var(--text-secondary);
+    font-family: "Geist", system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+
+  /* ---------------- stage ---------------- */
+  #stage { position: fixed; inset: 0 0 84px 0; overflow: hidden; }
+
+  #particles { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  .hero {
+    position: absolute; inset: 0;
+    display: grid; grid-template-columns: minmax(0,1.05fr) minmax(0,0.95fr);
+    align-items: center; gap: 48px;
+    padding: 0 clamp(24px, 6vw, 96px);
+    max-width: 1440px; margin: 0 auto;
+  }
+  .copy { display: flex; flex-direction: column; gap: 20px; }
+  .beat { opacity: 0; will-change: transform, opacity; }
+
+  .eyebrow {
+    display: flex; align-items: center; gap: 12px;
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 11px; font-weight: 500; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--text-muted);
+  }
+  .eyebrow i { width: 3px; height: 3px; border-radius: 50%; background: var(--text-faint); font-style: normal; }
+
+  h1 {
+    font-size: clamp(56px, 9vw, 118px); font-weight: 700;
+    line-height: .82; letter-spacing: -.045em; color: var(--text-primary);
+    display: flex; flex-direction: column;
+  }
+  h1 span { display: block; }
+
+  .role {
+    display: flex; align-items: center; gap: 12px;
+    font-size: clamp(16px, 1.5vw, 20px); color: var(--text-primary); letter-spacing: -.005em;
+  }
+  .role em { display: block; width: 48px; height: 1px; background: var(--signal); flex: 0 0 auto; }
+
+  .tagline { max-width: 46ch; color: var(--text-secondary); font-size: 16px; }
+
+  .actions { display: flex; align-items: center; gap: 20px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px; border-radius: 4px;
+    background: var(--signal); color: var(--surface-void);
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase;
+  }
+  .avail {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--text-muted); border-bottom: 1px solid var(--line-standard); padding-bottom: 2px;
+  }
+
+  /* portrait slot — particles converge into this rect */
+  #slot { position: relative; aspect-ratio: 906/1024; max-height: 74%; width: 100%; justify-self: center; }
+
+  /* ---------------- overlay (variants B and C) ---------------- */
+  #overlay {
+    position: absolute; inset: 0; z-index: 5;
+    background: var(--surface-void);
+    display: grid; place-items: center;
+    will-change: transform, opacity;
+  }
+  #overlay[hidden] { display: none; }
+
+  .readout { width: min(440px, 78vw); display: flex; flex-direction: column; gap: 10px; }
+  .rline {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 10px;
+    font-family: "Geist Mono", ui-monospace, monospace; font-size: 11px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted);
+    opacity: 0; will-change: opacity;
+  }
+  .rline b { color: var(--text-secondary); font-weight: 500; }
+  .rline u { border-bottom: 1px dotted var(--line-standard); text-decoration: none; transform: translateY(-3px); }
+  .rline s { color: var(--signal); text-decoration: none; font-variant-numeric: tabular-nums; }
+  .rbar { height: 1px; background: var(--line-hairline); margin-top: 14px; position: relative; overflow: hidden; }
+  .rbar i { position: absolute; inset: 0; background: var(--signal); transform: scaleX(0); transform-origin: left center; }
+
+  .plot { width: min(460px, 80vw); }
+  .plot svg { display: block; width: 100%; height: 190px; overflow: visible; }
+  .plot .axis { stroke: var(--line-standard); stroke-width: 1; }
+  .plot .curve { fill: none; stroke: var(--signal); stroke-width: 1.75; stroke-linecap: round; }
+  .plot .head { fill: var(--signal); }
+  .plotmeta {
+    display: flex; justify-content: space-between; margin-top: 14px;
+    font-family: "Geist Mono", ui-monospace, monospace; font-size: 11px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted);
+  }
+  .plotmeta s { color: var(--signal); text-decoration: none; font-variant-numeric: tabular-nums; }
+
+  /* corner readout for variant D */
+  #corner {
+    position: absolute; left: clamp(24px, 6vw, 96px); bottom: 40px; z-index: 4;
+    display: flex; flex-direction: column; gap: 6px; opacity: 0;
+    font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted);
+    will-change: opacity;
+  }
+  #corner s { color: var(--signal); text-decoration: none; font-variant-numeric: tabular-nums; }
+
+  /* ---------------- controls ---------------- */
+  #bar {
+    position: fixed; left: 0; right: 0; bottom: 0; height: 84px; z-index: 20;
+    display: flex; align-items: center; gap: 20px;
+    padding: 0 24px; background: var(--surface-raised);
+    border-top: 1px solid var(--line-hairline);
+    font-family: "Geist Mono", ui-monospace, monospace; font-size: 11px;
+    letter-spacing: .12em; text-transform: uppercase;
+  }
+  #bar .grp { display: flex; align-items: center; gap: 8px; }
+  #bar .lbl { color: var(--text-faint); }
+  button {
+    font: inherit; letter-spacing: inherit; text-transform: inherit;
+    padding: 9px 14px; border-radius: 4px; cursor: pointer;
+    background: transparent; color: var(--text-secondary);
+    border: 1px solid var(--line-standard);
+    transition: color var(--dur-1) var(--ease-micro), border-color var(--dur-1) var(--ease-micro);
+  }
+  button:hover { color: var(--text-primary); border-color: var(--signal); }
+  button[aria-pressed="true"] { background: var(--signal); color: var(--surface-void); border-color: var(--signal); }
+  button:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+  .spacer { flex: 1; }
+  #note { color: var(--text-faint); text-transform: none; letter-spacing: 0; font-family: "Geist", sans-serif; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <canvas id="particles"></canvas>
+
+  <div class="hero">
+    <div class="copy">
+      <p class="eyebrow beat" data-beat="eyebrow"><span>Arizona State University</span><i></i><span>CS 2028</span></p>
+      <h1><span class="beat" data-beat="name1">Hill</span><span class="beat" data-beat="name2">Sudani</span></h1>
+      <p class="role beat" data-beat="role"><em></em><span>ML systems / quant research</span></p>
+      <p class="tagline beat" data-beat="tagline">Four projects, one line of work &mdash; from a hand-derived gradient to a circuit inside a pretrained model. The negative results are the load-bearing ones.</p>
+      <div class="actions beat" data-beat="cta">
+        <span class="btn">Follow the arc
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10"/><path d="M3.5 8.5 8 13l4.5-4.5"/></svg>
+        </span>
+        <span class="avail">Available Summer 2027</span>
+      </div>
+    </div>
+    <div id="slot"></div>
+  </div>
+
+  <div id="corner">
+    <div>Particles <s id="cornerCount">0</s></div>
+    <div>Portrait <s id="cornerState">sampling</s></div>
+  </div>
+
+  <div id="overlay" hidden></div>
+</div>
+
+<div id="bar">
+  <div class="grp">
+    <span class="lbl">Variant</span>
+    <button data-variant="A" aria-pressed="true">A · Assembly</button>
+    <button data-variant="B" aria-pressed="false">B · Calibration</button>
+    <button data-variant="C" aria-pressed="false">C · Descent</button>
+    <button data-variant="D" aria-pressed="false">D · A + B</button>
+  </div>
+  <div class="grp">
+    <span class="lbl">Speed</span>
+    <button data-speed="1" aria-pressed="true">1&times;</button>
+    <button data-speed="0.5" aria-pressed="false">0.5&times;</button>
+    <button data-speed="0.25" aria-pressed="false">0.25&times;</button>
+  </div>
+  <div class="grp">
+    <button id="reduced" aria-pressed="false">Reduced motion</button>
+    <button id="replay">Replay &nbsp;(R)</button>
+  </div>
+  <span class="spacer"></span>
+  <span id="note"></span>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const IMG_SRC = "data:image/webp;base64,__IMAGE_B64__";
+
+  /* --- tokens mirrored from app/motion.ts --------------------------------- */
+  const DUR = { micro: .12, control: .22, reveal: .64, composition: .9, scene: 1.4 };
+  const TRAVEL = { sm: 16, md: 32, lg: 64 };
+
+  /** cubic-bezier(0.16, 1, 0.30, 1) — the one easing family, by Newton solve.
+      Both control-point y values are 1, so y(u) = 3u - 3u^2 + u^3. */
+  function ease(t) {
+    if (t <= 0) return 0; if (t >= 1) return 1;
+    const cx = 3 * .16, bx = 3 * (.3 - .16) - cx, ax = 1 - cx - bx;
+    let u = t;
+    for (let i = 0; i < 6; i++) {
+      const x = ((ax * u + bx) * u + cx) * u - t;
+      const d = (3 * ax * u + 2 * bx) * u + cx;
+      if (Math.abs(d) < 1e-6) break;
+      u -= x / d;
+    }
+    u = Math.min(1, Math.max(0, u));
+    const cy = 3, by = -3, ay = 1;
+    return ((ay * u + by) * u + cy) * u;
+  }
+  const clamp01 = v => Math.min(1, Math.max(0, v));
+  const seg = (t, a, b) => clamp01((t - a) / (b - a));
+
+  /* --- state -------------------------------------------------------------- */
+  const cv = document.getElementById("particles");
+  const ctx = cv.getContext("2d", { alpha: true });
+  const slot = document.getElementById("slot");
+  const overlay = document.getElementById("overlay");
+  const corner = document.getElementById("corner");
+  const note = document.getElementById("note");
+
+  let variant = "A", speed = 1, reduced = false;
+  let particles = [], W = 0, H = 0, dpr = 1, buf = null, buf32 = null;
+  let img = null, t0 = 0, raf = 0, sceneEls = null;
+
+  /* --- sampling ----------------------------------------------------------- */
+  function layout() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    const r = cv.getBoundingClientRect();
+    W = Math.max(1, Math.round(r.width * dpr));
+    H = Math.max(1, Math.round(r.height * dpr));
+    cv.width = W; cv.height = H;
+    buf = ctx.createImageData(W, H);
+    buf32 = new Uint32Array(buf.data.buffer);
+  }
+
+  function sample() {
+    if (!img || !W) return;
+    const sr = slot.getBoundingClientRect(), cr = cv.getBoundingClientRect();
+    // Draw the portrait into the slot rect, in canvas pixels.
+    const sw = sr.width * dpr, sh = sr.height * dpr;
+    const ox = (sr.left - cr.left) * dpr, oy = (sr.top - cr.top) * dpr;
+    const sc = Math.min(sw / img.width, sh / img.height);
+    const dw = img.width * sc, dh = img.height * sc;
+    const dx = ox + (sw - dw) / 2, dy = oy + (sh - dh) / 2;
+
+    const off = document.createElement("canvas");
+    off.width = W; off.height = H;
+    const oc = off.getContext("2d", { willReadFrequently: true });
+    oc.drawImage(img, dx, dy, dw, dh);
+    const d = oc.getImageData(0, 0, W, H).data;
+
+    const target = W * H > 2200000 ? 17000 : 12000;
+    let step = Math.max(1, Math.round(Math.sqrt((dw * dh) / (target * 1.7))));
+    const out = [];
+    for (let a = 0; a < 4; a++) {
+      out.length = 0;
+      for (let y = 0; y < H; y += step) {
+        for (let x = 0; x < W; x += step) {
+          const i = (y * W + x) * 4;
+          const r = d[i], g = d[i + 1], b = d[i + 2];
+          const l = .2126 * r + .7152 * g + .0722 * b;
+          if (l < 26) continue;
+          out.push({ tx: x, ty: y, sx: 0, sy: 0, x: 0, y: 0, r, g, b,
+                     a: Math.min(255, 90 + l * .75), delay: 0 });
+        }
+      }
+      if (out.length > target * 1.35 && step < 14) step++;
+      else if (out.length < target * .6 && step > 1) step--;
+      else break;
+    }
+    particles = out;
+    document.getElementById("cornerCount").textContent = out.length.toLocaleString();
+  }
+
+  /* --- per-variant particle seeding --------------------------------------- */
+  function seed() {
+    const cx = W / 2, cy = H / 2;
+    const maxR = Math.hypot(cx, cy);
+    for (const p of particles) {
+      if (variant === "A" || variant === "D") {
+        // Scattered across the WHOLE viewport, not just around the slot.
+        p.sx = Math.random() * W;
+        p.sy = Math.random() * H;
+        p.delay = (Math.hypot(p.tx - cx, p.ty - cy) / maxR) * .3 + Math.random() * .14;
+      } else {
+        // B and C hide the field behind an overlay, so a tight scatter is enough.
+        const ang = Math.atan2(p.ty - cy, p.tx - cx) + (Math.random() - .5) * 1.4;
+        const dist = maxR * (.4 + Math.random() * .5);
+        p.sx = cx + Math.cos(ang) * dist;
+        p.sy = cy + Math.sin(ang) * dist;
+        p.delay = Math.random() * .18;
+      }
+      p.x = p.sx; p.y = p.sy;
+    }
+  }
+
+  /* --- overlays ----------------------------------------------------------- */
+  function buildOverlay() {
+    overlay.innerHTML = "";
+    overlay.hidden = !(variant === "B" || variant === "C");
+    overlay.style.opacity = "1";
+    overlay.style.transform = "translateY(0)";
+    if (variant === "B") {
+      const rows = [
+        ["Typeface", "Geist / Geist Mono", "resolved"],
+        ["Portrait", "906 &times; 1024", "decoded"],
+        ["Particles", "sampled", "0"],
+        ["Research arc", "projects", "4"],
+      ];
+      overlay.innerHTML =
+        '<div class="readout">' +
+        rows.map(r => `<div class="rline"><b>${r[0]}</b><u></u><s>${r[2]}</s></div>`).join("") +
+        '<div class="rbar"><i></i></div></div>';
+    } else if (variant === "C") {
+      overlay.innerHTML =
+        '<div class="plot">' +
+        '<svg viewBox="0 0 420 160" preserveAspectRatio="none">' +
+        '<line class="axis" x1="0" y1="159" x2="420" y2="159"/>' +
+        '<line class="axis" x1="0.5" y1="0" x2="0.5" y2="159"/>' +
+        '<path class="curve" d=""/><circle class="head" cx="0" cy="0" r="3" opacity="0"/>' +
+        '</svg>' +
+        '<div class="plotmeta"><span>MNIST training loss &middot; epoch <s class="epochv">1</s>/10</span><span><s class="lossv">0.5823</s></span></div>' +
+        '</div>';
+    }
+  }
+
+  /* --- the scene ---------------------------------------------------------- */
+  const BEATS = { eyebrow: 1.04, name1: .9, name2: .98, role: 1.04, tagline: 1.14, cta: 1.3 };
+
+  function resetBeats() {
+    sceneEls = [...document.querySelectorAll(".beat")];
+    for (const el of sceneEls) { el.style.opacity = "0"; el.style.transform = ""; }
+    corner.style.opacity = "0";
+    document.getElementById("cornerState").textContent = "sampling";
+  }
+
+  function play() {
+    cancelAnimationFrame(raf);
+    layout(); sample(); seed(); buildOverlay(); resetBeats();
+    t0 = performance.now();
+    raf = requestAnimationFrame(tick);
+  }
+
+  function tick(now) {
+    const t = ((now - t0) / 1000) * speed;
+    drawParticles(t);
+    drawBeats(t);
+    if (variant === "B") drawCalibration(t);
+    if (variant === "C") drawDescent(t);
+    if (variant === "D") drawCorner(t);
+    const done = t > (variant === "A" || variant === "D" ? 2.6 : 3.0);
+    raf = done ? 0 : requestAnimationFrame(tick);
+    if (done) note.textContent = "Sequence complete — press R to replay.";
+    else note.textContent = "";
+  }
+
+  function drawParticles(t) {
+    if (!buf32) return;
+    buf32.fill(0);
+    // B and C hold the field until their overlay starts lifting.
+    const gate = (variant === "B" || variant === "C") ? 0.95 : 0;
+    const env = reduced ? .001 : DUR.scene;
+    const g = clamp01((t - gate) / env);
+    for (const p of particles) {
+      const local = clamp01((g - p.delay) / (1 - p.delay));
+      const e = ease(local);
+      const x = (p.sx + (p.tx - p.sx) * e) | 0;
+      const y = (p.sy + (p.ty - p.sy) * e) | 0;
+      if (x < 0 || y < 0 || x >= W || y >= H) continue;
+      const c = (p.a << 24) | (p.b << 16) | (p.g << 8) | p.r;
+      const b = y * W + x;
+      buf32[b] = c;
+      if (x + 1 < W) buf32[b + 1] = c;
+      if (y + 1 < H) { buf32[b + W] = c; if (x + 1 < W) buf32[b + W + 1] = c; }
+    }
+    ctx.putImageData(buf, 0, 0);
+  }
+
+  function drawBeats(t) {
+    // B and C run their beats after the overlay lifts.
+    const shift = (variant === "B" || variant === "C") ? 1.15 : 0;
+    for (const el of sceneEls) {
+      const at = BEATS[el.dataset.beat] + shift;
+      const d = reduced ? .32 : DUR.composition;
+      const p = ease(seg(t, at, at + d));
+      const dist = reduced ? 0 : (el.dataset.beat.startsWith("name") ? TRAVEL.lg : TRAVEL.sm);
+      el.style.opacity = String(p);
+      el.style.transform = `translateY(${(1 - p) * dist}px)`;
+    }
+  }
+
+  function drawCalibration(t) {
+    const lines = overlay.querySelectorAll(".rline");
+    const bar = overlay.querySelector(".rbar i");
+    const stagger = reduced ? .08 : .14;
+    lines.forEach((ln, i) => {
+      const at = .1 + i * stagger;
+      ln.style.opacity = String(ease(seg(t, at, at + .28)));
+      if (i === 2) {
+        const v = Math.round(particles.length * ease(seg(t, at, at + .5)));
+        ln.querySelector("s").textContent = v.toLocaleString();
+      }
+    });
+    bar.style.transform = `scaleX(${ease(seg(t, .1, .95))})`;
+    const lift = ease(seg(t, .95, 1.45));
+    overlay.style.transform = `translateY(${-lift * 100}%)`;
+    overlay.style.opacity = String(1 - clamp01(lift * 1.2));
+    if (lift >= 1) overlay.hidden = true;
+  }
+
+  /* The REAL training loss from nn-from-scratch/artifacts/metrics.json —
+     training_history.loss, ten epochs. Nothing on this site is invented, and a
+     loading curve is not the place to start. */
+  const LOSS = [0.582327, 0.280242, 0.224899, 0.189676, 0.164906,
+                0.145257, 0.129959, 0.117178, 0.105856, 0.097628];
+  const LOSS_MAX = 0.62, LOSS_MIN = 0.06;
+
+  function lossAt(u) {
+    // Interpolate between measured epochs; never extrapolate past them.
+    const x = clamp01(u) * (LOSS.length - 1);
+    const i = Math.min(LOSS.length - 2, Math.floor(x));
+    const f = x - i;
+    return LOSS[i] + (LOSS[i + 1] - LOSS[i]) * f;
+  }
+
+  function drawDescent(t) {
+    const path = overlay.querySelector(".curve");
+    const head = overlay.querySelector(".head");
+    const lossv = overlay.querySelector(".lossv");
+    const epochv = overlay.querySelector(".epochv");
+    const p = ease(seg(t, .1, .95));
+    const N = 90, pts = [];
+    // SVG y grows downward: highest loss -> smallest y, or the curve draws
+      // upward and reads as the model getting worse.
+      const yOf = v => 9 + ((LOSS_MAX - v) / (LOSS_MAX - LOSS_MIN)) * 150;
+    for (let i = 0; i <= N * p; i++) {
+      const u = i / N;
+      pts.push([u * 420, yOf(lossAt(u))]);
+    }
+    if (pts.length > 1) {
+      path.setAttribute("d", "M" + pts.map(q => q[0].toFixed(1) + " " + q[1].toFixed(1)).join(" L"));
+      const last = pts[pts.length - 1];
+      head.setAttribute("cx", last[0]); head.setAttribute("cy", last[1]);
+      head.setAttribute("opacity", "1");
+      lossv.textContent = lossAt(p).toFixed(4);
+      epochv.textContent = String(Math.max(1, Math.round(p * LOSS.length)));
+    }
+    const lift = ease(seg(t, .95, 1.45));
+    overlay.style.transform = `translateY(${-lift * 100}%)`;
+    overlay.style.opacity = String(1 - clamp01(lift * 1.2));
+    if (lift >= 1) overlay.hidden = true;
+  }
+
+  function drawCorner(t) {
+    const inP = ease(seg(t, .12, .5));
+    const outP = ease(seg(t, 1.5, 2.0));
+    corner.style.opacity = String(inP * (1 - outP));
+    document.getElementById("cornerState").textContent =
+      t > 1.35 ? "resolved" : t > .5 ? "converging" : "sampling";
+  }
+
+  /* --- controls ----------------------------------------------------------- */
+  function pressGroup(sel, attr, val) {
+    document.querySelectorAll(sel).forEach(b =>
+      b.setAttribute("aria-pressed", String(b.dataset[attr] === String(val))));
+  }
+  document.querySelectorAll("[data-variant]").forEach(b => b.onclick = () => {
+    variant = b.dataset.variant; pressGroup("[data-variant]", "variant", variant); play();
+  });
+  document.querySelectorAll("[data-speed]").forEach(b => b.onclick = () => {
+    speed = parseFloat(b.dataset.speed); pressGroup("[data-speed]", "speed", speed); play();
+  });
+  const rb = document.getElementById("reduced");
+  rb.onclick = () => { reduced = !reduced; rb.setAttribute("aria-pressed", String(reduced)); play(); };
+  document.getElementById("replay").onclick = play;
+  addEventListener("keydown", e => {
+    if (e.key === "r" || e.key === "R") play();
+    if (["1","2","3","4"].includes(e.key)) {
+      variant = ["A","B","C","D"][+e.key - 1];
+      pressGroup("[data-variant]", "variant", variant); play();
+    }
+  });
+  let rt = 0;
+  addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(play, 200); });
+
+  /* --- boot --------------------------------------------------------------- */
+  const im = new Image();
+  im.onload = () => { img = im; play(); };
+  im.onerror = () => { note.textContent = "Portrait failed to decode."; };
+  im.src = IMG_SRC;
+})();
+</script>
+</body>
+</html>

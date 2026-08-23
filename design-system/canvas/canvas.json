@@ -1,0 +1,46 @@
+{
+  "artboards": [
+    { "file": "Current.dc.html", "x": 0, "y": 0, "w": 960, "h": 720, "title": "Current — shipped today" },
+    { "file": "Main.dc.html", "x": 1080, "y": 0, "w": 960, "h": 720, "title": "Option A — Archive" },
+    { "file": "Instrument.dc.html", "x": 2160, "y": 0, "w": 960, "h": 720, "title": "Option B — Instrument" },
+    { "file": "Graphite.dc.html", "x": 3240, "y": 0, "w": 960, "h": 720, "title": "Option C — Graphite" }
+  ],
+  "annotations": [
+    {
+      "id": "the-diagnosis",
+      "x": 0,
+      "y": -230,
+      "w": 500,
+      "text": "THE DIAGNOSIS\n\nThe structure, type and motion are fine. Colour is what reads as generated:\n\n1. Lime #C6F24E on near-black is the single most-used palette in AI-built dev portfolios.\n2. Three high-chroma accents compete — nothing recedes.\n3. #08090B is untinted, the default dark-mode base.\n\nAll three options fix the same three things: tint the base, drop chroma hard, and hold every accent at one shared lightness so only hue varies."
+    },
+    {
+      "id": "option-a-note",
+      "x": 1080,
+      "y": -230,
+      "w": 440,
+      "text": "OPTION A — ARCHIVE  ← my recommendation\n\nThe only direction that is both restrained AND distinctive. Almost no technical portfolio is warm-dark, so it is memorable without shouting.\n\nIt is also the only one where the particle portrait needs no recolouring — its cream dots and faint gold specks are already this temperature.\n\nTradeoff: brass drifts toward luxury-brand if it spreads past verdicts. Keep it on results only."
+    },
+    {
+      "id": "option-b-note",
+      "x": 2160,
+      "y": -230,
+      "w": 440,
+      "text": "OPTION B — INSTRUMENT\n\nStrongest read for the quant side — Two Sigma, HRT. Feels like a measurement device rather than a portfolio.\n\nTradeoff: blue-on-dark is the default 'serious tech' palette, so it is the least differentiated of the three. The warm portrait also has to be tinted cool to sit in it, which I can do in the canvas render."
+    },
+    {
+      "id": "option-c-note",
+      "x": 3240,
+      "y": -230,
+      "w": 440,
+      "text": "OPTION C — GRAPHITE\n\nMost disciplined. Colour is withdrawn almost entirely, so the type ramp and spacing carry the page and an accent means something when it finally appears.\n\nTradeoff: it is the safest, and safe cuts against your goal of a site a recruiter remembers. Works only if the motion carries the personality alone."
+    },
+    {
+      "id": "contrast-note",
+      "x": 0,
+      "y": 790,
+      "w": 620,
+      "text": "All three palettes were built in oklch and checked, not eyeballed. Within each option the accents share one lightness and one chroma and vary only in hue, which is what stops them competing.\n\nEvery text step clears WCAG AA on every surface: primary 15.6–16.4:1, secondary 8.3–8.6:1, muted 5.0:1 on raised panels. Accents land at 8.9–9.8:1, so a metric stays readable at the smallest size it is ever set."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}

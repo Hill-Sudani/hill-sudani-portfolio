@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;700&display=swap">
+  <style>
+    body { margin: 0; background: #0C0C0D; font-family: "Geist", system-ui, sans-serif; }
+    a { color: #99C1A6; text-decoration: none; }
+    a:hover { color: #EBEBED; }
+  </style>
+</helmet>
+<div style="width: 960px; height: 720px; background: #0C0C0D; color: #ACACAF; display: flex; flex-direction: column; padding: 32px 40px; box-sizing: border-box; gap: 26px;">
+
+  <div style="display: flex; align-items: baseline; gap: 12px; border-bottom: 1px solid rgba(235,235,237,0.09); padding-bottom: 14px;">
+    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #99C1A6;">OPTION C</span>
+    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #EBEBED;">Graphite</span>
+    <span style="flex-grow: 1;"></span>
+    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; color: #87878B;">#0C0C0D base</span>
+  </div>
+
+  <div style="display: flex; gap: 40px; align-items: flex-start;">
+    <div style="display: flex; flex-direction: column; gap: 18px; flex-grow: 1;">
+
+      <div style="display: flex; align-items: center; gap: 12px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #87878B;">
+        <span>Arizona State University</span>
+        <span style="width: 3px; height: 3px; border-radius: 50%; background: #87878B;"></span>
+        <span>CS 2028</span>
+      </div>
+
+      <h1 style="margin: 0; font-size: 94px; font-weight: 700; line-height: 0.82; letter-spacing: -0.045em; color: #EBEBED; display: flex; flex-direction: column;">
+        <span>Hill</span>
+        <span>Sudani</span>
+      </h1>
+
+      <div style="display: flex; align-items: center; gap: 12px; font-size: 19px; line-height: 1.5; letter-spacing: -0.005em; color: #EBEBED;">
+        <span style="display: block; width: 48px; height: 1px; background: #99C1A6; flex-shrink: 0;"></span>
+        <span>ML systems / quant research</span>
+      </div>
+
+      <p style="margin: 0; max-width: 46ch; font-size: 17px; line-height: 1.6; color: #ACACAF; text-wrap: pretty;">Four projects, one line of work &#8212; from a hand-derived gradient to a circuit inside a pretrained model. The negative results are the load-bearing ones.</p>
+
+      <div style="display: flex; align-items: center; gap: 20px; margin-top: 4px;">
+        <span style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 4px; background: #99C1A6; color: #0C0C0D; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;">
+          Follow the arc
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10"></path><path d="M3.5 8.5 8 13l4.5-4.5"></path></svg>
+        </span>
+        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #87878B; border-bottom: 1px solid rgba(235,235,237,0.16); padding-bottom: 2px;">Available Summer 2027</span>
+      </div>
+    </div>
+
+    <div style="width: 226px; height: 256px; flex-shrink: 0; border: 1px solid rgba(235,235,237,0.09); border-radius: 4px; background: #060607; display: flex; align-items: center; justify-content: center;">
+      <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #87878B; text-align: center; line-height: 1.7;">Particle<br>portrait</span>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding: 22px; border: 1px solid rgba(235,235,237,0.09); border-radius: 4px; background: #171719;">
+    <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid #99C1A6;">
+      <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 38px; font-weight: 700; line-height: 1.08; letter-spacing: -0.022em; font-variant-numeric: tabular-nums lining-nums; color: #99C1A6;">97.01%</span>
+      <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #87878B;">MNIST test accuracy</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid #D8A99F;">
+      <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 38px; font-weight: 700; line-height: 1.08; letter-spacing: -0.022em; font-variant-numeric: tabular-nums lining-nums; color: #D8A99F;">6.04&#215;</span>
+      <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #87878B;">End-to-end slowdown</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid #A7B8CA;">
+      <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 38px; font-weight: 700; line-height: 1.08; letter-spacing: -0.022em; font-variant-numeric: tabular-nums lining-nums; color: #A7B8CA;">11,256</span>
+      <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #87878B;">Bridged matmul calls</span>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: stretch; border: 1px solid rgba(235,235,237,0.09); border-radius: 4px; overflow: hidden;">
+    <div style="flex-grow: 1; background: #0C0C0D; padding: 9px 12px; display: flex; flex-direction: column; gap: 3px;"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 9px; letter-spacing: 0.1em; color: #87878B;">BASE</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #EBEBED;">#0C0C0D</span></div>
+    <div style="flex-grow: 1; background: #171719; padding: 9px 12px; display: flex; flex-direction: column; gap: 3px;"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 9px; letter-spacing: 0.1em; color: #87878B;">RAISED</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #EBEBED;">#171719</span></div>
+    <div style="flex-grow: 1; background: #99C1A6; padding: 9px 12px; display: flex; flex-direction: column; gap: 3px;"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 9px; letter-spacing: 0.1em; color: #0C0C0D; opacity: 0.7;">SIGNAL</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #0C0C0D;">#99C1A6</span></div>
+    <div style="flex-grow: 1; background: #D8A99F; padding: 9px 12px; display: flex; flex-direction: column; gap: 3px;"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 9px; letter-spacing: 0.1em; color: #0C0C0D; opacity: 0.7;">NULL</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #0C0C0D;">#D8A99F</span></div>
+    <div style="flex-grow: 1; background: #A7B8CA; padding: 9px 12px; display: flex; flex-direction: column; gap: 3px;"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 9px; letter-spacing: 0.1em; color: #0C0C0D; opacity: 0.7;">TRACE</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #0C0C0D;">#A7B8CA</span></div>
+    <div style="flex-grow: 1.7; background: #060607; padding: 9px 12px; display: flex; flex-direction: column; gap: 3px;"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 9px; letter-spacing: 0.1em; color: #87878B;">TEXT &#183; SECONDARY &#183; MUTED</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #EBEBED;">#EBEBED <span style="color: #ACACAF;">#ACACAF</span> <span style="color: #87878B;">#87878B</span></span></div>
+  </div>
+
+  <p style="margin: 0; font-size: 13px; line-height: 1.45; color: #87878B; max-width: 92ch; text-wrap: pretty;">Colour almost withdrawn. Typography and spacing carry the page; an accent appears only where a result has a verdict. Tradeoff: the most restrained and the least memorable — it risks reading as under-designed rather than confident.</p>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview": {"width": 960, "height": 720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
