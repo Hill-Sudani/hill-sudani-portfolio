@@ -75,10 +75,6 @@ than a disable, and GSAP and Lenis kept out of the initial bundle.
 npm run lint
 ```
 
-```bash
-npm run sites:build
-```
-
 ## Data accuracy
 
 Every number on the site is read from a project artifact in
@@ -96,5 +92,13 @@ When editing project content:
 
 ## Deployment
 
-Standard Next.js hosting via `npm run build`, or the bundled Cloudflare-compatible
-artifact via `npm run sites:build`.
+Deployed on Vercel at **https://hill-sudani.vercel.app**, built from `master`
+on every push. No configuration file is needed — Vercel detects Next.js and runs
+the `build` script.
+
+The page is fully static (`○` in the build output), so it is served from the CDN
+edge with no serverless invocation per visit. Keep it that way: reading
+`headers()` or `cookies()` anywhere in the tree silently turns the route dynamic.
+
+`app/layout.tsx` pins the production origin used for Open Graph tags. Set
+`NEXT_PUBLIC_SITE_URL` to override it when a custom domain lands.

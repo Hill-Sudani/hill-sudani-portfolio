@@ -15,7 +15,6 @@
 
 # next.js
 /.next/
-/.vinext/
 /out/
 
 # misc
@@ -37,15 +36,9 @@ yarn-error.log*
 # typescript
 next-env.d.ts
 /tsconfig.tsbuildinfo
-/dist/
-/.wrangler/
-/outputs/
-/work/
 
 # local archives and generated design experiments
 /tmp/
-/build/*
-!/build/sites-vite-plugin.ts
 public/loading-lab.html
 
 # Python bytecode
