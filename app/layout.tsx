@@ -2,27 +2,7 @@ import type { Metadata } from "next";
 import "geist/font/sans";
 import "geist/font/mono";
 import "./globals.css";
-
-/**
- * Resolved at build time, which is what keeps this page STATIC.
- *
- * Deriving the origin from `headers()` forces Next to render the route on every
- * request — the page cannot be prerendered, so it gives up full CDN caching and
- * pays a serverless invocation per visit. Nothing on this site varies by
- * request, so that cost bought nothing.
- *
- * Order: an explicit NEXT_PUBLIC_SITE_URL wins (set it when a custom domain
- * lands); otherwise the production domain; otherwise localhost for `next dev`.
- *
- * A literal rather than Vercel's VERCEL_PROJECT_PRODUCTION_URL, because that
- * variable resolves to the per-deployment preview host, which would put preview
- * URLs into the Open Graph tags of a production build.
- */
-const PRODUCTION_URL = "https://hill-sudani.vercel.app";
-
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.NODE_ENV === "production" ? PRODUCTION_URL : "http://localhost:3000");
+import { siteUrl } from "./site-url";
 
 const title = "Hill Sudani | Software Engineer, ML & Quant Research";
 const description =
@@ -32,6 +12,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title,
   description,
+  // Tells crawlers which origin is authoritative, so preview deployments
+  // and any future custom domain cannot compete with it in the index.
+  alternates: { canonical: "/" },
   icons: {
     icon: [{ url: "/icon.svg?v=3", type: "image/svg+xml", sizes: "any" }],
     shortcut: "/icon.svg?v=3",

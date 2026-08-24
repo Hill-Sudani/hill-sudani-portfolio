@@ -487,3 +487,80 @@ test("keeps the accessibility foundations", async () => {
   // Every count-up exposes its true value to assistive tech.
   assert.match(html, /class="sr-only"/);
 });
+
+/* ========================================================================== */
+/* Discoverability                                                            */
+/* ========================================================================== */
+
+/**
+ * A portfolio nobody can find is a portfolio that does not work. These three
+ * artefacts all encode the site's origin, and they have to agree: a canonical
+ * pointing one place while the sitemap advertises another is worse than having
+ * neither, because it splits the site across two entries in an index.
+ */
+test("is discoverable, and agrees with itself about where it lives", async () => {
+  const origin = "https://hill-sudani.vercel.app";
+
+  const robots = await fetch(`http://127.0.0.1:${port}/robots.txt`);
+  assert.equal(robots.status, 200, "robots.txt must be served");
+  assert.equal(
+    robots.headers.get("content-type")?.split(";")[0],
+    "text/plain",
+    "robots.txt must be plain text, not the 404 page",
+  );
+  const robotsBody = await robots.text();
+  assert.match(robotsBody, /Allow: \//, "the site must not be disallowed");
+  assert.match(robotsBody, new RegExp(`Sitemap: ${origin}/sitemap\.xml`));
+
+  const sitemap = await fetch(`http://127.0.0.1:${port}/sitemap.xml`);
+  assert.equal(sitemap.status, 200, "sitemap.xml must be served");
+  const sitemapBody = await sitemap.text();
+  assert.match(sitemapBody, new RegExp(`<loc>${origin}</loc>`));
+
+  // The canonical is what stops preview deployments competing with production.
+  const html = await page();
+  assert.match(html, new RegExp(`<link rel="canonical" href="${origin}"/>`));
+
+  // One module owns the origin, so these can never drift apart.
+  const layout = await read("app/layout.tsx");
+  const robotsSrc = await read("app/robots.ts");
+  const sitemapSrc = await read("app/sitemap.ts");
+  for (const [name, src] of [
+    ["layout.tsx", layout],
+    ["robots.ts", robotsSrc],
+    ["sitemap.ts", sitemapSrc],
+  ]) {
+    assert.match(
+      src,
+      /from "\.\/site-url"/,
+      `${name} must take the origin from site-url.ts, not hardcode its own`,
+    );
+    assert.doesNotMatch(
+      src,
+      /https:\/\/hill-sudani/,
+      `${name} hardcodes the origin — it belongs in site-url.ts alone`,
+    );
+  }
+});
+
+/**
+ * The social card is the first thing a recruiter sees when the link is pasted
+ * into Slack or a DM. It has to be the right shape, and small enough that the
+ * unfurling service actually fetches it rather than timing out.
+ */
+test("ships a social card that unfurlers will actually load", async () => {
+  const response = await fetch(`http://127.0.0.1:${port}/og.png`);
+  assert.equal(response.status, 200);
+
+  const bytes = Buffer.from(await response.arrayBuffer());
+  assert.equal(bytes.subarray(1, 4).toString("latin1"), "PNG", "must be a PNG");
+
+  // PNG stores dimensions in the IHDR chunk at a fixed offset.
+  assert.equal(bytes.readUInt32BE(16), 1200, "og:image width must match the tag");
+  assert.equal(bytes.readUInt32BE(20), 630, "og:image height must match the tag");
+
+  assert.ok(
+    bytes.length < 1_000_000,
+    `og.png is ${(bytes.length / 1024).toFixed(0)}KB — too heavy for reliable unfurling`,
+  );
+});
