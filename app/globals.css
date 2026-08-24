@@ -774,8 +774,10 @@ html[data-cursor="custom"] button {
 
 .arc-intro-line {
   display: block;
-  /* Floor at 0.32 — an inactive line is dimmed, never illegible (§6). */
-  opacity: 0.32;
+  /* Floor at 0.4 — an inactive line is dimmed, never illegible (§6).
+     0.32 composited to #54514d = 2.47:1, which failed that promise; 0.4
+     gives #66635e = 3.27:1, clearing the 3:1 large-text minimum. */
+  opacity: 0.4;
   color: var(--text-primary);
   transition: opacity var(--dur-3) var(--ease-out),
     color var(--dur-3) var(--ease-out);

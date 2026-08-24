@@ -12,7 +12,7 @@ const LINES = ["Build it.", "Measure it.", "Try to break it.", "Report what surv
  * The previous build swept these in from ±320px and dimmed the inactive lines
  * to 0.06 opacity — illegible while moving, and a mostly-blank section at rest.
  * Here the travel is capped at --travel-md (32px, the text ceiling) and the
- * resting opacity floor is 0.28, so every line stays readable throughout.
+ * resting opacity floor is 0.4, so every line stays readable throughout.
  */
 export function Thesis() {
   const ref = useRef<HTMLElement>(null);
@@ -61,8 +61,12 @@ function ThesisLine({
   const focus = start + 0.12;
   const end = focus + 0.16;
 
-  // Floor at 0.28 rather than 0.06 — an unfocused line is still readable.
-  const opacity = useTransform(progress, [start, focus, end], [0.28, 1, 0.4]);
+  // Floor at 0.4, not 0.06 and not 0.28: --text-primary over --surface-void
+  // composites to #66635e at this alpha, which is 3.27:1 — the first value
+  // that clears WCAG's 3:1 minimum for large text. An unfocused line is
+  // dimmed, but it is never below the legibility floor, including on the
+  // frames where it is still moving.
+  const opacity = useTransform(progress, [start, focus, end], [0.4, 1, 0.4]);
   const y = useTransform(progress, [start, focus], [32, 0]);
 
   return (

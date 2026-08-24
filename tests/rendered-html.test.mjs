@@ -183,7 +183,12 @@ test("keeps colour in tokens and accents in one family", async () => {
   // stylesheet — the grain tint and the translucent scrolled header — because
   // both need an alpha channel over an unknown backdrop.
   const allowed = new Set(["rgba(234, 229, 221, 0.028)", "rgba(14, 12, 9, 0.88)"]);
-  const literals = [...css.matchAll(/#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)/g)]
+  // Comments are stripped first: this rule is about what the stylesheet
+  // DECLARES, and a comment recording a measured contrast ratio is
+  // documentation, not a hardcoded colour. Without this, writing down why a
+  // value was chosen would fail the test that it was chosen correctly.
+  const declarations = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const literals = [...declarations.matchAll(/#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)/g)]
     .map((m) => m[0])
     .filter((c) => !allowed.has(c));
   assert.deepEqual(literals, [], `hardcoded colours in globals.css: ${literals}`);
@@ -563,4 +568,63 @@ test("ships a social card that unfurlers will actually load", async () => {
     bytes.length < 1_000_000,
     `og.png is ${(bytes.length / 1024).toFixed(0)}KB — too heavy for reliable unfurling`,
   );
+});
+
+/**
+ * The design system promises dimmed text is "never illegible". That promise was
+ * being made in comments while the values missed it: the arc intro's inactive
+ * lines sat at 0.32 opacity and the thesis floor at 0.28, which composite over
+ * --surface-void to 2.47:1 and 2.18:1 — both under WCAG's 3:1 minimum for large
+ * text. This pins the floor to the alpha that actually satisfies the claim.
+ */
+test("dimmed text never drops below the legibility floor", async () => {
+  const srgb = (c) => (c / 255 <= 0.03928 ? c / 255 / 12.92 : ((c / 255 + 0.055) / 1.055) ** 2.4);
+  const luminance = ([r, g, b]) => 0.2126 * srgb(r) + 0.7152 * srgb(g) + 0.0722 * srgb(b);
+  const contrast = (a, b) => {
+    const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (hi + 0.05) / (lo + 0.05);
+  };
+  const FG = [0xea, 0xe5, 0xdd]; // --text-primary
+  const BG = [0x0e, 0x0c, 0x09]; // --surface-void
+  const ratioAt = (alpha) =>
+    contrast(FG.map((c, i) => Math.round(alpha * c + (1 - alpha) * BG[i])), BG);
+
+  // Sanity-check the model against the value Lighthouse measured in the browser.
+  assert.equal(ratioAt(0.32).toFixed(2), "2.47");
+
+  const MIN = 3; // WCAG 1.4.3, large text
+  assert.ok(ratioAt(0.4) >= MIN, "0.4 must clear the floor");
+  assert.ok(ratioAt(0.36) < MIN, "the floor must be a real boundary, not slack");
+
+  const css = await read("app/globals.css");
+  const inactive = css.match(/\.arc-intro-line\s*\{[\s\S]*?opacity:\s*([\d.]+)/);
+  assert.ok(inactive, "could not read the inactive arc-intro-line opacity");
+  assert.ok(
+    ratioAt(Number(inactive[1])) >= MIN,
+    `inactive arc lines sit at ${inactive[1]} = ${ratioAt(Number(inactive[1])).toFixed(2)}:1`,
+  );
+
+  const thesis = await read("app/components/Thesis.tsx");
+  const stops = thesis.match(/\[start, focus, end\],\s*\[([\d.]+),\s*1,\s*([\d.]+)\]/);
+  assert.ok(stops, "could not read the thesis opacity keyframes");
+  for (const stop of [stops[1], stops[2]]) {
+    assert.ok(
+      ratioAt(Number(stop)) >= MIN,
+      `thesis rests at ${stop} = ${ratioAt(Number(stop)).toFixed(2)}:1`,
+    );
+  }
+});
+
+/**
+ * An aria-label REPLACES the accessible name rather than adding to it, so a
+ * label that omits the visible text leaves voice-control users with no way to
+ * address the control (WCAG 2.5.3, Label in Name).
+ */
+test("the wordmark's accessible name contains its visible text", async () => {
+  const header = await read("app/components/Header.tsx");
+  const wordmark = header.match(/<a className="wordmark"[\s\S]*?<\/a>/);
+  assert.ok(wordmark, "the wordmark must not carry an aria-label");
+  assert.doesNotMatch(wordmark[0], /aria-label/);
+  assert.match(wordmark[0], /HS/);
+  assert.match(wordmark[0], /sr-only/, "the expansion must remain available to AT");
 });

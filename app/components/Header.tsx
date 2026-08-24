@@ -37,13 +37,16 @@ export function Header() {
   return (
     <header className="site-header" data-scrolled={scrolled ? "true" : "false"}>
       <div className="site-header-inner shell">
-        <a
-          aria-label="Hill Sudani, home"
-          className="wordmark"
-          href="#top"
-          onClick={() => setOpen(false)}
-        >
+        {/*
+          No aria-label here. An aria-label REPLACES the accessible name, so
+          "Hill Sudani, home" erased the visible "HS" — and a voice-control
+          user saying "click HS" then matched nothing (WCAG 2.5.3, Label in
+          Name). Appending the expansion as screen-reader-only text keeps the
+          visible string inside the accessible name instead of overriding it.
+        */}
+        <a className="wordmark" href="#top" onClick={() => setOpen(false)}>
           HS
+          <span className="sr-only">&nbsp;— Hill Sudani, home</span>
         </a>
 
         <nav aria-label="Primary" className="desktop-nav">
